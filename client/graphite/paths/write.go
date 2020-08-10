@@ -17,8 +17,13 @@ import (
 func ToDatapoints(s *model.Sample, format Format, prefix string, rules []*config.Rule, templateData map[string]interface{}) ([]string, error) {
 	t := float64(s.Timestamp.UnixNano()) / 1e9
 	v := float64(s.Value)
-	if math.IsNaN(v) || math.IsInf(v, 0) {
+	//if math.IsNaN(v) || math.IsInf(v, 0) {
+	if math.IsInf(v, 0) {
 		return nil, errors.New("invalid sample value")
+	}
+
+	if math.IsNaN(v) {
+		return nil, nil
 	}
 
 	paths, err := pathsFromMetric(s.Metric, format, prefix, rules, templateData)
