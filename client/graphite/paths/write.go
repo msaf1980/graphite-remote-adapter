@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"regexp"
 	"sort"
 
 	"github.com/criteo/graphite-remote-adapter/client/graphite/config"
@@ -104,6 +105,8 @@ func defaultPath(m model.Metric, format Format, prefix string) string {
 	}
 	sort.Sort(labels)
 
+	r := regexp.MustCompile("[0-9A-Fa-f]{8}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{12}")
+
 	first := true
 	for _, l := range labels {
 		if l == model.MetricNameLabel || len(l) == 0 {
@@ -112,6 +115,11 @@ func defaultPath(m model.Metric, format Format, prefix string) string {
 
 		k := string(l)
 		v := graphite_tmpl.Escape(string(m[l]))
+
+		// Match against UUID regex and replace
+		if r.MatchString(v) {
+			v = "replaced"
+		}
 
 		// When using carbon tags only for a set of known labels, make sure to filter those
 		// before creating the tag
