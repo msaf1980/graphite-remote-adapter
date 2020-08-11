@@ -20,6 +20,7 @@ benchmark.txt
 /.tarballs
 
 !/.travis.yml
+!/.gitlab-ci.yml
 
 # JS stuff
 node_modules/

@@ -1,0 +1,24 @@
+variables:
+  REGISTRY_URL: "registry.kontur.host"
+  REGISTRY_TEAM: "kubernetes"
+  REGISTRY_PROJECT: "prometheus"
+  IMAGE_NAME: "graphite-adapter"
+
+
+build_and_push:
+  image: docker:stable
+  before_script:
+    - docker login $REGISTRY_URL --username $REGISTRY_USER --password $REGISTRY_PASS
+    - export IMAGE_VERSION=${CI_COMMIT_TAG}
+  script:
+    - >
+      docker build
+      --label "branch=$CI_COMMIT_REF_NAME"
+      --label "commit=$CI_COMMIT_SHA"
+      --label "builder=$GITLAB_USER_NAME"
+      --tag $REGISTRY_URL/$REGISTRY_TEAM/$REGISTRY_PROJECT/$IMAGE_NAME:$IMAGE_VERSION .
+    - docker push $REGISTRY_URL/$REGISTRY_TEAM/$REGISTRY_PROJECT/$IMAGE_NAME:$IMAGE_VERSION
+  after_script:
+    - docker logout $REGISTRY_URL
+  only: [tags]
+  tags: [docker-build]
