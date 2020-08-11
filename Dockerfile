@@ -1,10 +1,12 @@
-FROM        prom/busybox:latest
-MAINTAINER  Corentin Chary <corentin.chary@gmail.com>
+FROM golang:1.13 as builder
 
-COPY graphite-remote-adapter                /bin/graphite-remote-adapter
+RUN mkdir -p $GOPATH/src/github.com/criteo
+WORKDIR $GOPATH/src/github.com/criteo/graphite-remote-adapter
+COPY . .
+RUN make build
 
-EXPOSE     9092
-VOLUME     [ "/graphite-remote-adapter" ]
-WORKDIR    /graphite-remote-adapter
-ENTRYPOINT [ "/bin/graphite-remote-adapter" ]
-CMD        [ "-graphite-address=localhost:2003" ]
+
+FROM alpine
+COPY --from=builder /go/src/github.com/criteo/graphite-remote-adapter/graphite-remote-adapter /bin/.
+EXPOSE 9201
+ENTRYPOINT graphite-remote-adapter --config.file=/adapter/config.yaml
