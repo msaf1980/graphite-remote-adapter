@@ -47,13 +47,11 @@ func pathsFromMetric(m model.Metric, format Format, prefix string, rules []*conf
 			return cachedPaths.([]string), nil
 		}
 	}
-	//paths, stop, err := templatedPaths(m, rules, templateData)
+	paths, stop, err := templatedPaths(m, rules, templateData)
 	// if it doesn't match any rule, use default path
-	// if !stop {
-	// 	paths = append(paths, defaultPath(m, format, prefix))
-	// }
-	// Disable use stop path
-	paths, _, err := templatedPaths(m, rules, templateData)
+	if !stop {
+		paths = append(paths, defaultPath(m, format, prefix))
+	}
 	if pathsCacheEnabled {
 		pathsCache.Set(m.Fingerprint().String(), paths, cache.DefaultExpiration)
 	}
