@@ -18,6 +18,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/go-kit/kit/log"
@@ -59,6 +60,7 @@ func reload(cliCfg *config.Config, logger log.Logger) (*config.Config, error) {
 		cfg.Write.Timeout = cliCfg.Write.Timeout
 	}
 
+	cfg.Graphite.FilteredTags = strings.ReplaceAll(cfg.Graphite.FilteredTags, " ", "")
 	return cfg, nil
 }
 
