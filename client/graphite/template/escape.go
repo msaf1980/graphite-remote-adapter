@@ -15,7 +15,6 @@ package template
 
 import (
 	"bytes"
-	"fmt"
 	"net/url"
 	"strings"
 )
@@ -84,18 +83,11 @@ func Escape(tv string) string {
 	for i := 0; i < length; i++ {
 		b := tv[i]
 		switch {
-		// . is reserved by graphite, % is used to escape other bytes.
-		case b == '.' || b == '%' || b == '/' || b == '=':
-			fmt.Fprintf(result, "%%%X", b)
-		// These symbols are ok only if backslash escaped.
-		case strings.IndexByte(symbols, b) != -1:
-			result.WriteString("\\" + string(b))
-		// These are all fine.
 		case strings.IndexByte(printables, b) != -1:
 			result.WriteByte(b)
 		// Defaults to percent-encoding.
 		default:
-			fmt.Fprintf(result, "%%%X", b)
+			result.WriteString("_")
 		}
 	}
 	return result.String()
