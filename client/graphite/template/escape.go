@@ -25,7 +25,7 @@ const (
 	symbols    = "(){},=.'\"\\"
 	printables = ("0123456789abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-		"!\"#$%&\\'()*+,-./:;<=>?@[\\]^_`{|}~")
+		"_-")
 )
 
 // Graphite doesn't support tags, so label names and values must be
