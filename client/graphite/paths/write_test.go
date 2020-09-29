@@ -60,29 +60,29 @@ func loadTestConfig(s string) *config.Config {
 
 func TestDefaultPathsFromMetric(t *testing.T) {
 	expected := "prefix." +
-		"test:metric" +
-		".many_chars.abc!ABC:012-3!45%C3%B667~89%2E%2F\\(\\)\\{\\}\\,%3D%2E\\\"\\\\" +
+		"test_metric" +
+		".many_chars.abc_ABC_012-3_45__67_89___________" +
 		".owner.team-X" +
-		".testlabel.test:value"
+		".testlabel.test_value"
 	actual, err := pathsFromMetric(metric, Format{Type: FormatCarbon}, "prefix.", nil, nil)
 	require.Equal(t, expected, actual[0])
 	require.Empty(t, err)
 
 	expected = "prefix." +
-		"test:metric" +
-		";many_chars=abc!ABC:012-3!45%C3%B667~89%2E%2F\\(\\)\\{\\}\\,%3D%2E\\\"\\\\" +
+		"test_metric" +
+		";many_chars=abc_ABC_012-3_45__67_89___________" +
 		";owner=team-X" +
-		";testlabel=test:value"
+		";testlabel=test_value"
 
 	actual, err = pathsFromMetric(metric, Format{Type: FormatCarbonTags}, "prefix.", nil, nil)
 	require.Equal(t, expected, actual[0])
 	require.Empty(t, err)
 
 	expected = "prefix." +
-		"test:metric{" +
-		"many_chars=\"abc!ABC:012-3!45%C3%B667~89%2E%2F\\(\\)\\{\\}\\,%3D%2E\\\"\\\\\"" +
+		"test_metric{" +
+		"many_chars=\"abc_ABC_012-3_45__67_89___________\"" +
 		",owner=\"team-X\"" +
-		",testlabel=\"test:value\"" +
+		",testlabel=\"test_value\"" +
 		"}"
 	actual, err = pathsFromMetric(metric, Format{Type: FormatCarbonOpenMetrics}, "prefix.", nil, nil)
 	require.Equal(t, expected, actual[0])
@@ -91,10 +91,10 @@ func TestDefaultPathsFromMetric(t *testing.T) {
 
 func TestDefaultPathWithFilteredTags(t *testing.T) {
 	expected := "prefix." +
-		"test:metric" +
-		".many_chars.abc!ABC:012-3!45%C3%B667~89%2E%2F\\(\\)\\{\\}\\,%3D%2E\\\"\\\\" +
+		"test_metric" +
+		".many_chars.abc_ABC_012-3_45__67_89___________" +
 		".owner.team-X" +
-		".testlabel.test:value"
+		".testlabel.test_value"
 
 	actual, err := pathsFromMetric(metric, Format{Type: FormatCarbon}, "prefix.", nil, nil)
 	require.Equal(t, expected, actual[0])
@@ -106,9 +106,9 @@ func TestDefaultPathWithFilteredTags(t *testing.T) {
 	require.Empty(t, err)
 
 	expected = "prefix." +
-		"test:metric" +
-		".many_chars.abc!ABC:012-3!45%C3%B667~89%2E%2F\\(\\)\\{\\}\\,%3D%2E\\\"\\\\" +
-		".testlabel.test:value" +
+		"test_metric" +
+		".many_chars.abc_ABC_012-3_45__67_89___________" +
+		".testlabel.test_value" +
 		";owner=team-X"
 
 	actual, err = pathsFromMetric(metric, Format{Type: FormatCarbonTags, FilteredTags: []string{"owner"}}, "prefix.", nil, nil)
@@ -116,10 +116,10 @@ func TestDefaultPathWithFilteredTags(t *testing.T) {
 	require.Empty(t, err)
 
 	expected = "prefix." +
-		"test:metric" +
-		".many_chars.abc!ABC:012-3!45%C3%B667~89%2E%2F\\(\\)\\{\\}\\,%3D%2E\\\"\\\\" +
+		"test_metric" +
+		".many_chars.abc_ABC_012-3_45__67_89___________" +
 		";owner=team-X" +
-		";testlabel=test:value"
+		";testlabel=test_value"
 
 	actual, err = pathsFromMetric(metric, Format{Type: FormatCarbonTags, FilteredTags: []string{"owner", "testlabel"}}, "prefix.", nil, nil)
 	require.Equal(t, expected, actual[0])
@@ -135,10 +135,10 @@ func TestUnmatchedMetricPathsFromMetric(t *testing.T) {
 	}
 	expected := make([]string, 0)
 	expected = append(expected, "prefix."+
-		"test:metric"+
+		"test_metric"+
 		".owner.team-K"+
-		".testlabel.test:value"+
-		".testlabel2.test:value2")
+		".testlabel.test_value"+
+		".testlabel2.test_value2")
 	actual, err := pathsFromMetric(unmatchedMetric, Format{Type: FormatCarbon}, "prefix.", testConfig.Write.Rules, testConfig.Write.TemplateData)
 	require.Equal(t, expected, actual)
 	require.Empty(t, err)
@@ -154,12 +154,12 @@ func TestTemplatedPathsFromMetric(t *testing.T) {
 
 func TestTemplatedPathsFromMetricWithDefault(t *testing.T) {
 	expected := make([]string, 0)
-	expected = append(expected, "tmpl_1.data%2Efoo.team-X")
+	expected = append(expected, "tmpl_1.data_foo.team-X")
 	expected = append(expected, "prefix."+
-		"test:metric"+
-		".many_chars.abc!ABC:012-3!45%C3%B667~89%2E%2F\\(\\)\\{\\}\\,%3D%2E\\\"\\\\"+
+		"test_metric"+
+		".many_chars.abc_ABC_012-3_45__67_89___________"+
 		".owner.team-X"+
-		".testlabel.test:value")
+		".testlabel.test_value")
 	actual, err := pathsFromMetric(metric, Format{Type: FormatCarbon}, "prefix.", testConfig.Write.Rules, testConfig.Write.TemplateData)
 	require.Equal(t, expected, actual)
 	require.Empty(t, err)
@@ -173,7 +173,7 @@ func TestMultiTemplatedPathsFromMetric(t *testing.T) {
 		"testlabel2":          "test:value2",
 	}
 	expected := make([]string, 0)
-	expected = append(expected, "tmpl_1.data%2Efoo.team-X")
+	expected = append(expected, "tmpl_1.data_foo.team-X")
 	expected = append(expected, "tmpl_2.team-X.data.foo")
 	actual, err := pathsFromMetric(multiMatchMetric, Format{Type: FormatCarbon}, "prefix.", testConfig.Write.Rules, testConfig.Write.TemplateData)
 	require.Equal(t, expected, actual)

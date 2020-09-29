@@ -20,7 +20,7 @@ import (
 func TestEscape(t *testing.T) {
 	// Can we correctly keep and escape valid chars.
 	value := "abzABZ019(){},'\"\\"
-	expected := "abzABZ019\\(\\)\\{\\}\\,\\'\\\"\\\\"
+	expected := "abzABZ019________"
 	actual := Escape(value)
 	if expected != actual {
 		t.Errorf("Expected %s, got %s", expected, actual)
@@ -28,7 +28,7 @@ func TestEscape(t *testing.T) {
 
 	// Test percent-encoding.
 	value = "é/|_;:%."
-	expected = "%C3%A9%2F|_;:%25%2E"
+	expected = "_________"
 	actual = Escape(value)
 	if expected != actual {
 		t.Errorf("Expected %s, got %s", expected, actual)
